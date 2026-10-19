@@ -6,10 +6,7 @@
 #define S_HEIGHT 2
 #define S_WIDTH 3
 
-bool run = true;
-
 void refreshClock();
-void checkKill();
 
 int main() {
     std::cout << "\n";
@@ -36,9 +33,7 @@ int main() {
 
     std::cout << "\n\n";
 
-    std::thread tCheckKill(checkKill);
-
-    while (run) {
+    while (true) {
         std::thread clock(refreshClock);
 
         std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -47,13 +42,4 @@ int main() {
     }
 
     return 0;
-}
-
-void checkKill() {
-    while (run) {
-        char btn;
-        std::cin.get(btn);
-        if (btn == 27)
-            run = false;
-    }
 }
