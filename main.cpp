@@ -1,5 +1,6 @@
 #include <iostream>
 #include <chrono>
+#include <csignal>
 #include <thread>
 
 #define HEIGHT 10
@@ -12,11 +13,15 @@
 void refreshClock();
 time_t getClosestChristmas();
 bool formatTime(time_t time, std::string &formatted);
+void stop(int);
 
 int main() {
-    std::cout << "\n";
+    std::signal(SIGINT, stop);
+
+    std::cout << "\033[?25l\033[H\r\033[2J\n";
 
     for (int i = 0; i <= HEIGHT - 1; i++) {
+        std::cout << "\r\033[K";
         for (int j = 0; j <= HEIGHT - i; j++) {
             std::cout << " ";
         }
@@ -27,6 +32,7 @@ int main() {
     }
 
     for (int i = 0; i <= S_HEIGHT - 1; i++) {
+        std::cout << "\r\033[K";
         for (int j = 0; j <= HEIGHT - (S_WIDTH / 2); j++) {
             std::cout << " ";
         }
@@ -58,7 +64,7 @@ void refreshClock() {
     std::string formatted;
     formatTime(timeUntilChristmas, formatted);
 
-    std::cout << "\r\033[K" << formatted << std::flush;
+    std::cout << "\r\033[K" << "Time left to Christmas Eve: " << formatted << std::flush;
 }
 
 time_t getClosestChristmas() {
@@ -80,7 +86,12 @@ bool formatTime(time_t time, std::string &formatted) {
     minutes = std::to_string(iMinutes);
     seconds = std::to_string(iSeconds);
 
-    formatted = days + "D " + hours + "H " + minutes + "M " + seconds + "S";
+    formatted = "\033[42m\033[31m" + days + "D " + hours + "H " + minutes + "M " + seconds + "S\033[49m\033[39m";
 
     return true;
+}
+
+void stop(int) {
+    write(STDOUT_FILENO, "\033[?25h\033[0m\033[H\r\033[2J", 18);
+    _exit(130);
 }
