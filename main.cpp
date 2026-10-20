@@ -5,9 +5,13 @@
 #define HEIGHT 10
 #define S_HEIGHT 2
 #define S_WIDTH 3
+#define MINUTE 60
+#define HOUR (MINUTE * 60)
+#define DAY (HOUR * 24)
 
 void refreshClock();
 time_t getClosestChristmas();
+bool formatTime(time_t time, std::string &formatted);
 
 int main() {
     std::cout << "\n";
@@ -51,9 +55,32 @@ void refreshClock() {
 
     time_t timeUntilChristmas = closestChristmas - now;
 
-    std::cout << "\r\033[K" << timeUntilChristmas << std::flush;
+    std::string formatted;
+    formatTime(timeUntilChristmas, formatted);
+
+    std::cout << "\r\033[K" << formatted << std::flush;
 }
 
 time_t getClosestChristmas() {
     return 1798066800;
+}
+
+bool formatTime(time_t time, std::string &formatted) {
+    std::string days = "999", hours = "99", minutes = "99", seconds = "99";
+    uint16_t iDays;
+    uint8_t iHours, iMinutes, iSeconds;
+
+    iDays = time / DAY;
+    iHours = time / HOUR - iDays * 24;
+    iMinutes  = time / MINUTE - iHours * 60 - iDays * 24 * 60;
+    iSeconds = time - iMinutes * 60 - iHours * 60 * 60 - iDays * 24 * 60 * 60;
+
+    days = std::to_string(iDays);
+    hours = std::to_string(iHours);
+    minutes = std::to_string(iMinutes);
+    seconds = std::to_string(iSeconds);
+
+    formatted = days + "D " + hours + "H " + minutes + "M " + seconds + "S";
+
+    return true;
 }
