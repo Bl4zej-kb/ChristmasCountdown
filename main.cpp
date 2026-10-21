@@ -2,6 +2,7 @@
 #include <chrono>
 #include <csignal>
 #include <thread>
+#include <cstdlib>
 
 #define HEIGHT 10
 #define S_HEIGHT 2
@@ -9,15 +10,24 @@
 #define MINUTE 60
 #define HOUR (MINUTE * 60)
 #define DAY (HOUR * 24)
+#define BAUBLE_CHANCE 3
 
+
+// function declarations ----------------------------------
 void refreshClock();
 void refreshTree();
 time_t getClosestChristmas();
 bool formatTime(time_t time, std::string &formatted);
 void stop(int);
 void refreshAll();
+void drawPixel();
+// function declarations ==================================
 
+
+// function definitions -----------------------------------
 int main() {
+    srand(time(nullptr));
+
     std::signal(SIGINT, stop);
 
     std::cout << "\033[?25l\033[H\r\033[2J\n"; //hide cursor, move it to top left corner, move to start of line, clear whole terminal, move to new line
@@ -42,10 +52,12 @@ void refreshTree() {
             std::cout << " ";
         }
         for (int j = 0; j <= i * 2; j++) {
-            std::cout << "*";
+            drawPixel();
         }
         std::cout << "\n";
     }
+
+    std::cout << "\033[90m";
 
     for (int i = 0; i <= S_HEIGHT - 1; i++) {
         std::cout << "\r\033[K";
@@ -58,7 +70,7 @@ void refreshTree() {
         std::cout << "\n";
     }
 
-    std::cout << "\n\n";
+    std::cout << "\033[39m\n\n";
 }
 
 void refreshClock() {
@@ -106,3 +118,71 @@ void refreshAll() {
     refreshTree();
     refreshClock();
 }
+
+void drawPixel() {
+    if (rand()%BAUBLE_CHANCE == 0) {
+        switch (rand()%14) {
+            case 0:
+                std::cout << "\033[31m";
+                break;
+
+            case 1:
+                std::cout << "\033[32m";
+                break;
+
+            case 2:
+                std::cout << "\033[33m";
+                break;
+
+            case 3:
+                std::cout << "\033[34m";
+                break;
+
+            case 4:
+                std::cout << "\033[35m";
+                break;
+
+            case 5:
+                std::cout << "\033[36m";
+                break;
+
+            case 6:
+                std::cout << "\033[37m";
+                break;
+
+            case 7:
+                std::cout << "\033[91m";
+                break;
+
+            case 8:
+                std::cout << "\033[92m";
+                break;
+
+            case 9:
+                std::cout << "\033[93m";
+                break;
+
+            case 10:
+                std::cout << "\033[94m";
+                break;
+
+            case 11:
+                std::cout << "\033[95m";
+                break;
+
+            case 12:
+                std::cout << "\033[96m";
+                break;
+
+            case 13:
+                std::cout << "\033[97m";
+                break;
+
+
+        }
+    }
+    else std::cout << "\033[32m";
+
+    std::cout << "*\033[39m";
+}
+// function definitions ===================================
