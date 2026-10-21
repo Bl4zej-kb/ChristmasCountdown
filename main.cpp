@@ -11,14 +11,30 @@
 #define DAY (HOUR * 24)
 
 void refreshClock();
+void refreshTree();
 time_t getClosestChristmas();
 bool formatTime(time_t time, std::string &formatted);
 void stop(int);
+void refreshAll();
 
 int main() {
     std::signal(SIGINT, stop);
 
-    std::cout << "\033[?25l\033[H\r\033[2J\n";
+    std::cout << "\033[?25l\033[H\r\033[2J\n"; //hide cursor, move it to top left corner, move to start of line, clear whole terminal, move to new line
+
+    while (true) {
+        std::thread tick(refreshAll);
+
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        tick.join();
+    }
+
+    return 0;
+}
+
+void refreshTree() {
+    std::cout << "\033[H\r\033[2J\n";
 
     for (int i = 0; i <= HEIGHT - 1; i++) {
         std::cout << "\r\033[K";
@@ -43,16 +59,6 @@ int main() {
     }
 
     std::cout << "\n\n";
-
-    while (true) {
-        std::thread clock(refreshClock);
-
-        std::this_thread::sleep_for(std::chrono::seconds(1));
-
-        clock.join();
-    }
-
-    return 0;
 }
 
 void refreshClock() {
@@ -94,4 +100,9 @@ bool formatTime(time_t time, std::string &formatted) {
 void stop(int) {
     write(STDOUT_FILENO, "\033[?25h\033[0m\033[H\r\033[2J", 18);
     _exit(130);
+}
+
+void refreshAll() {
+    refreshTree();
+    refreshClock();
 }
